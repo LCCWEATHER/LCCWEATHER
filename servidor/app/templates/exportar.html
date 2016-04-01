@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% set active_id = 'export' %}
+
+{% block head %}
+{{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='export_styles.css') }}">
+{% endblock %}
+
+
+{% block content %}
+  <div class="page-header">
+    <h1>Exportar datos</h1>
+  </div>
+  <p class="lead">Esta pagina hara algo en el futuro</p>
+{% endblock %}
