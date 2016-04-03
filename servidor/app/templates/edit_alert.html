@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+{{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='edit_styles.css') }}">
+{% endblock %}
+
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ header_text }}</h1>
+</div>
+<form class="col-xs-6" method="POST">
+  {{ form.csrf_token }}
+
+  {{ super() }}
+
+  <label for="bodyInput">Cuerpo de alerta</label>
+  {{ form.text(class="form-control", id="bodyInput", placeholder="Alerta") }}
+  <label for="activeInput">Activa?</label>
+  {{ form.active(class="form-control", id="activeInput", placeholder="Contraseña") }}
+
+  <button type="submit" class="btn btn-primary btn-block boton-entrar">Actualizar</button>
+</form>
+{% endblock %}

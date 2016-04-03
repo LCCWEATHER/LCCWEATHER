@@ -5,6 +5,7 @@ from flask import current_app
 from app import app, bcrypt, db
 from app.servidor_clima.models import User
 
+
 def main():
     with app.app_context():
         db.metadata.create_all(db.engine)

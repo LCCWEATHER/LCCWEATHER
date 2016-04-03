@@ -2,6 +2,7 @@ from app import db
 import datetime
 import random
 
+
 class Lectura(db.Model):
     __tablename__ = 'test'
     id = db.Column(db.Integer, primary_key=True)

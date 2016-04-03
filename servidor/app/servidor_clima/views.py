@@ -64,8 +64,13 @@ def add_alert():
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash("Limite de alertas activas ya esta alcanzado", "error")
-    return render_template('editar_alerta.html', form=form, texto="Agregar alerta")
+                    flash("Limite de alertas activas ya esta alcanzado",
+                          "error")
+    return render_template(
+        'edit_alert.html',
+        form=form,
+        header_text="Agregar alerta"
+    )
 
 
 @mod.route('/modificar_alerta/<alert_id>', methods=["GET", "POST"])
@@ -73,6 +78,7 @@ def add_alert():
 def edit_alert(alert_id):
     form = AddAlertForm()
     alert = Alert.query.get(alert_id)
+    form.id.data = alert.id
     if request.method == 'POST':
         if form.validate_on_submit():
             alert.text = form.text.data
@@ -82,14 +88,14 @@ def edit_alert(alert_id):
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash("Limite de alertas activas ya esta alcanzado", "error")
+                    flash("Limite de alertas activas ya esta alcanzado",
+                          "error")
     form.text.data = alert.text
-    return render_template(
-        'editar_alerta.html',
-         form=form,
-         text="Modificar alerta",
-         alert=alert.text
-    )
+    form.active.data = alert.active
+    return render_template('edit_alert.html',
+                           form=form,
+                           header_text="Modificar alerta",
+                           alert=alert.text)
 
 
 @mod.route('/exportar', methods=["GET"])
@@ -101,7 +107,7 @@ def export_data():
 @mod.route('/eliminar_alerta/<alert_id>', methods=["GET"])
 @login_required
 def delete_alert(alert_id):
-    alert = Alert.query.get(alert_id);
+    alert = Alert.query.get(alert_id)
     db.session.delete(alert)
     db.session.commit()
     return redirect(url_for('.alert_list'))
@@ -110,7 +116,7 @@ def delete_alert(alert_id):
 @mod.route('/toggle_alerta/<alert_id>', methods=["GET"])
 @login_required
 def toggle_alert(alert_id):
-    alert = Alert.query.get(alert_id);
+    alert = Alert.query.get(alert_id)
 
     if alert.active:
         alert.active = False
