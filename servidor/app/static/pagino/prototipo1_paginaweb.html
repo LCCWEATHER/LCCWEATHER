@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+
+    <link rel="stylesheet" href="lalala.css" media="screen" title="no title" charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.11.0/fetch.min.js" charset="utf-8"></script>
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <title>web</title>
+  </head>
+  <body>
+    <div class="contenedor">
+      <div class="izquierda">
+        <div class="texto-izq">
+          <div class="fecha"></div>
+          <div class="hora"></div>
+          <ul class="alertas" id="contenedorAlertas">
+            <li>Es un bonito dia soleado</li>
+            <li>No es seguro salir sin proteción solar</li>
+          </ul>
+        </div>
+        <div class="grafica" id="grafica_temp">
+        </div>
+      </div>
+      <div class="derecha">
+        <div class="grupo-temp">
+
+          <div class="temperatura" id="valorTemperatura">
+            30°
+          </div>
+          <div class="termometro">
+            <div class="thermometer"></div>
+            <div class="bottom">
+            <div class="temperature"></div>
+            </div>
+          </div>
+          <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        </div>
+        <div class="datos">
+          <table class="tabla_datos">
+            <tr class="dato-prioridad">
+              <td>
+                Presión
+              </td>
+              <td id="valorPresion">
+                420
+              </td>
+            </tr>
+            <tr class="dato-prioridad">
+              <td>
+                Probabilidad de lluvia
+              </td>
+              <td>
+                20%
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Concentración CO
+              </td>
+              <td id="valorMonoxido">
+                69
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Concentración NO2
+              </td>
+              <td id="valorNitrogeno">
+                10%
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Humedad
+              </td>
+              <td id="valorHumedad">
+                30%
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="javascript.js" charset="utf-8"></script>
+</html>

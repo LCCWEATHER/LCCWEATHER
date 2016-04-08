@@ -18,6 +18,7 @@ def update():
         json['main']['pressure'],
         json['main']['humidity']
     )
+
     db.session.add(l)
 
     db.session.commit()

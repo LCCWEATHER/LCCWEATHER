@@ -1,4 +1,4 @@
-from app import db
+from app import db, ma
 import datetime
 import random
 
@@ -51,6 +51,16 @@ class User(db.Model):
 
     def is_anonymous(self):
         return False
+
+
+class LecturaSchema(ma.ModelSchema):
+    class Meta:
+        model = Lectura
+
+
+class AlertSchema(ma.ModelSchema):
+    class Meta:
+        model = Alert
 
 
 def init_db():
