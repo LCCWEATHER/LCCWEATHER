@@ -18,9 +18,9 @@ def user_loader(user_id):
 def request_loader(request):
     auth = request.authorization
     user = User.query.filter_by(username=auth['username']).first()
-    if bcrypt.check_password_hash(user.password, auth['password']):
+    if user and bcrypt.check_password_hash(user.password, auth['password']):
         return user
-    return none
+    return None
 
 
 @mod.route('/login', methods=["GET", "POST"])
@@ -153,7 +153,8 @@ def get_lecturas():
         print(result.data)
         return jsonify({'datos': result.data})
     if request.method == 'POST':
-        if not current_user:
+        print(current_user)
+        if not current_user.is_authenticated():
             abort(403)
         data = request.get_json()
         try:
