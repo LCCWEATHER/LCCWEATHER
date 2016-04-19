@@ -4,7 +4,7 @@ from .forms import LoginForm, AddAlertForm
 from .models import User, Alert, Lectura, LecturaSchema, AlertSchema
 from flask.ext.login import (login_required, login_user, logout_user,
                              current_user)
-from app import db, login_manager
+from app import db, login_manager, bcrypt
 
 mod = Blueprint('servidor_clima', __name__)
 
@@ -12,6 +12,15 @@ mod = Blueprint('servidor_clima', __name__)
 @login_manager.user_loader
 def user_loader(user_id):
     return User.query.get(user_id)
+
+
+@login_manager.request_loader
+def request_loader(request):
+    auth = request.authorization
+    user = User.query.filter_by(username=auth['username']).first()
+    if bcrypt.check_password_hash(user.password, auth['password']):
+        return user
+    return none
 
 
 @mod.route('/login', methods=["GET", "POST"])
@@ -104,7 +113,7 @@ def export_data():
     return render_template('exportar.html')
 
 
-@mod.route('/eliminar_alerta/<alert_id>', methods=["GET"])
+@mod.route('/eliminar_alerta/<alert_id>')
 @login_required
 def delete_alert(alert_id):
     alert = Alert.query.get(alert_id)
@@ -132,16 +141,32 @@ lecturas_schema = LecturaSchema(many=True)
 alerts_schema = AlertSchema(many=True)
 
 
-@mod.route('/api/lecturas')
+@mod.route('/api/lecturas', methods=['GET', 'POST'])
 def get_lecturas():
-    n = request.args.get('n')
+    if request.method == 'GET':
+        n = request.args.get('n')
 
-    if not n:
-        n = 1
-    lecturas = Lectura.query.order_by(Lectura.fecha.desc())[:n]
-    result = lecturas_schema.dump(lecturas)
-    print(result.data)
-    return jsonify({'datos': result.data})
+        if not n:
+            n = 1
+        lecturas = Lectura.query.order_by(Lectura.fecha.desc())[:n]
+        result = lecturas_schema.dump(lecturas)
+        print(result.data)
+        return jsonify({'datos': result.data})
+    if request.method == 'POST':
+        if not current_user:
+            abort(403)
+        data = request.get_json()
+        try:
+            l = Lectura(
+                temperatura=data['temperatura'],
+                presion=data['presion'],
+                humedad=data['humedad']
+            )
+            db.session.add(l)
+            db.session.commit()
+            return jsonify({'status': 'sik'})
+        except KeyError:
+            abort(500)
 
 
 @mod.route('/api/alertas')

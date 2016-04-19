@@ -22,3 +22,6 @@ def update():
     db.session.add(l)
 
     db.session.commit()
+
+if(__name__ == '__main__'):
+    update()
