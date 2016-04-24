@@ -11,16 +11,49 @@
   <h1>LCC Weather</h1>
   <p class="lead">Ingrese sus datos para entrar a la interfaz de<br>administrador de LCC Weather</p>
 </div>
-<form class="formulario-login" action="{{ url_for('servidor_clima.login') }}" method="POST">
+<form name = "login" onsubmit="return validateForm()" class="formulario-login" action="{{ url_for('servidor_clima.login') }}" method="POST">
   {{ form.csrf_token }}
-
   {{ super() }}
-
+  <div id = "errorMsg"></div>
   <label class="sr-only" for="usernameInput">Nombre de usuario</label>
-  {{ form.username(class="form-control", id="usernameInput", placeholder="Nombre de usuario") }}
+  {{ form.username(class="form-control", id="usernameInput", placeholder="Nombre de usuario",onfocus="clearr(this)",onblur="validateName(this)") }}
+  <div id = "errorMsg2"></div>
   <label class="sr-only" for="passwordInput">Contraseña</label>
-  {{ form.password(class="form-control", id="passwordInput", placeholder="Contraseña") }}
+  {{ form.password(class="form-control", id="passwordInput",onfocus="clearP(this)",onblur="validatePass(this)", placeholder="Contraseña") }}
 
-  <button type="submit" class="btn btn-primary btn-block btn-lg boton-entrar">Ingresar</button>
+  <button type="submit" class="btn btn-primary btn-block btn-lg boton-entrar"> Ingresar </button>
 </form>
+
+<script type="text/javascript">
+  function clearr(x) {
+    x.style.background = '#ffffff'
+    $('#errorMsg').html('');
+  }
+  function clearP(x) {
+    x.style.background = '#ffffff'
+    $('#errorMsg2').html('');
+  }
+  function validateName(textfield) {
+    var username = textfield.value
+    if (username.length < 5) {
+      textfield.style.background ='#F2DEDE';
+      $('#errorMsg').css('color','red');
+      $('#errorMsg').html('*Ingrese nombre de usuario válido');
+    }
+  }
+  function validatePass(textfield) {
+    var password = textfield.value
+    if (password.length < 1) {
+      textfield.style.background ='#F2DEDE';
+      $('#errorMsg2').css('color','red');
+      $('#errorMsg2').html('*Ingrese contraseña válida');
+    }
+  }
+function validateForm() {
+  var username = document.forms['login']['username'].value
+  var password = document.forms['login']['password'].value
+  if (username.length < 5 || password.length < 1) return false
+  return true
+}
+</script>
 {% endblock %}
