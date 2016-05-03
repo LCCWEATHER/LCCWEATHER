@@ -50,32 +50,32 @@ var horaActual = undefined;
 
 function cambiarFondoSegunHora(hora) {
   if(horaActual != hora) {
-    horaActual = hora;
+    horaActual = hora
 
-    document.body.style.background = toCSSGradient(grads[hora]);
+    document.body.style.background = toCSSGradient(grads[hora])
   }
 }
 
 function actualizarFondo() {
-  var fecha = new Date();
-  cambiarFondoSegunHora(fecha.getHours());
-  var cosa = document.querySelector(".fecha");
+  var fecha = new Date()
+  cambiarFondoSegunHora(fecha.getHours())
+  var cosa = document.querySelector(".fecha")
 
-  cosa.innerHTML = dias[fecha.getDay()] + " " + fecha.getDate() + " de " + meses[fecha.getMonth()] + " del " + fecha.getFullYear();
+  cosa.innerHTML = dias[fecha.getDay()] + " " + fecha.getDate() + " de " + meses[fecha.getMonth()] + " del " + fecha.getFullYear()
 
-  cosa = document.querySelector(".hora");
+  cosa = document.querySelector(".hora")
 
-  cosa.innerHTML = fecha.getHours() + ":" + fecha.getMinutes();
+  cosa.innerHTML = fecha.getHours() + ":" + fecha.getMinutes()
 }
 
-google.charts.load('current', {packages: ['corechart', 'line']});
-google.charts.setOnLoadCallback(drawBasic);
+google.charts.load('current', {packages: ['corechart', 'line']})
+google.charts.setOnLoadCallback(drawBasic)
 
 function drawBasic() {
 
-  var humedad = new google.visualization.DataTable();
-  var temperatura = new google.visualization.DataTable();
-  var presion = new google.visualization.DataTable();
+  var humedad = new google.visualization.DataTable()
+  var temperatura = new google.visualization.DataTable()
+  var presion = new google.visualization.DataTable()
   humedad.addColumn('timeofday','h')
   humedad.addColumn('number','b')
 
@@ -91,7 +91,7 @@ function drawBasic() {
     [[15, 12, 0, 0], 30],
     [[16, 45, 0], 32],
     [[16, 59, 0], 42]
-  ]);
+  ])
   temperatura.addColumn('timeofday','h')
   temperatura.addColumn('number','C°')
   temperatura.addRows([
@@ -106,10 +106,10 @@ function drawBasic() {
     [[15, 12, 0, 0], 30],
     [[16, 45, 0], 32],
     [[16, 59, 0], 42]
-  ]);
+  ])
 
-  presion.addColumn('timeofday', 'X');
-  presion.addColumn('number', 'ayy');
+  presion.addColumn('timeofday', 'X')
+  presion.addColumn('number', 'ayy')
 
   presion.addRows([
     [[8, 30, 45], 5],
@@ -123,7 +123,7 @@ function drawBasic() {
     [[15, 12, 0, 0], 30],
     [[16, 45, 0], 32],
     [[16, 59, 0], 42]
-  ]);
+  ])
   var opcion1 = {
     hAxis: {
       title: 'Hora',
@@ -145,7 +145,7 @@ function drawBasic() {
       title: 'Presión'
     },
     backgroundColor: { fill:'transparent' },
-  };
+  }
   var opcion3 = {
     hAxis: {
       title: 'Hora',
@@ -156,36 +156,41 @@ function drawBasic() {
       title: 'Humedad'
     },
     backgroundColor: { fill:'transparent' },
-  };
-  var chart = new google.visualization.LineChart(document.getElementById('grafica_temp'));
+  }
+  var chart = new google.visualization.LineChart(document.getElementById('grafica_temp'))
   var datos = [temperatura,presion,humedad]
   var opciones = [opcion1,opcion2,opcion3]
   var graficaActual = 0;
   function siguienteGrafica() {
     graficaActual = (graficaActual + 1) % 3;
-    chart.draw(datos[graficaActual], opciones[graficaActual]);
+    chart.draw(datos[graficaActual], opciones[graficaActual])
   }
   chart.draw(datos[0],opciones[0])
-  setInterval(siguienteGrafica, 3 * 1000);
+  setInterval(siguienteGrafica, 3 * 1000)
+  
+  return {
+    chart,
+    datos
+  }
 }
 var alturaMax = 123
 function actualizar_termometro(cTemp) {
   var cTempPercent = cTemp * alturaMax / 45
   var cMargin = -cTempPercent+20;
   if (cTemp > -50) {
-      if (cTemp >= 50) {
-        $('.temperature').height(200);
-        $('.temperature').css({
-          'margin-top': '-180px'
-        });
-      }
-      $('.temperature').height(cTempPercent);
+    if (cTemp >= 50) {
+      $('.temperature').height(200);
       $('.temperature').css({
-        'margin-top': cMargin + 'px'
+        'margin-top': '-180px'
       });
-    } else {
-      $('.temperature').height(0);
     }
+    $('.temperature').height(cTempPercent);
+    $('.temperature').css({
+      'margin-top': cMargin + 'px'
+    });
+  } else {
+    $('.temperature').height(0);
+  }
 }
 
 function cargarDatosInciales() {
@@ -219,6 +224,6 @@ function cargarAlertas() {
     })
 }
 
-cargarDatosInciales()
+var datos = cargarDatosInciales()
 actualizarFondo()
 setInterval(actualizarFondo, 60 * 1000);

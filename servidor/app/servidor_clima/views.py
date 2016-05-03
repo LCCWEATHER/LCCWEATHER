@@ -5,6 +5,7 @@ from .models import User, Alert, Lectura, LecturaSchema, AlertSchema
 from flask.ext.login import (login_required, login_user, logout_user,
                              current_user)
 from app import db, login_manager, bcrypt
+import datetime
 
 mod = Blueprint('servidor_clima', __name__)
 
@@ -17,9 +18,10 @@ def user_loader(user_id):
 @login_manager.request_loader
 def request_loader(request):
     auth = request.authorization
-    user = User.query.filter_by(username=auth['username']).first()
-    if user and bcrypt.check_password_hash(user.password, auth['password']):
-        return user
+    if auth:
+        user = User.query.filter_by(username=auth['username']).first()
+        if user and bcrypt.check_password_hash(user.password, auth['password']):
+            return user
     return None
 
 
@@ -145,12 +147,20 @@ alerts_schema = AlertSchema(many=True)
 def get_lecturas():
     if request.method == 'GET':
         n = request.args.get('n')
+        
+        d = request.args.get('d')
 
-        if not n:
+        if not n and not d:
             n = 1
-        lecturas = Lectura.query.order_by(Lectura.fecha.desc())[:n]
+        if d:
+            d = datetime.datetime.utcfromtimestamp(float(d)/1000.0)
+            print(d.minute)
+            lecturas = Lectura.query.filter(Lectura.fecha >= d).order_by(Lectura.fecha.desc())
+        else:
+            lecturas = Lectura.query.order_by(Lectura.fecha.desc())
+        if n:
+            lecturas = lecturas[:n]
         result = lecturas_schema.dump(lecturas)
-        print(result.data)
         return jsonify({'datos': result.data})
     if request.method == 'POST':
         print(current_user)
