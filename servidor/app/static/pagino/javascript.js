@@ -76,15 +76,15 @@ function drawBasic() {
   var humedad = new google.visualization.DataTable()
   var temperatura = new google.visualization.DataTable()
   var presion = new google.visualization.DataTable()
-  humedad.addColumn('timeofday','h')
+  humedad.addColumn('datetime','h')
   humedad.addColumn('number','b')
-  temperatura.addColumn('timeofday','h')
+  temperatura.addColumn('datetime','h')
   temperatura.addColumn('number','C°')
-  presion.addColumn('timeofday', 'X')
+  presion.addColumn('datetime', 'X')
   presion.addColumn('number', 'ayy')
 
   
-  var ultimaActualizacion = Date.now() - 2 * 60 * 60 * 1000
+  var ultimaActualizacion = Date.now() - 1 * 60 * 60 * 1000
   var graficaActual = 0;
   function actualizarGrafica() {
     cargarDatos(ultimaActualizacion).then(function(datos) {
@@ -204,9 +204,9 @@ function agregarDatos(presion, humedad, temperatura, datos) {
   datos.reverse().forEach(function(lectura) {
     var time = new Date(lectura.fecha)
     var timeofday = [time.getHours(), time.getMinutes(), time.getSeconds()]
-    humedad.addRow([timeofday, lectura.humedad]);
-    temperatura.addRow([timeofday, lectura.temperatura]);
-    presion.addRow([timeofday, lectura.presion]);
+    humedad.addRow([time, lectura.humedad]);
+    temperatura.addRow([time, lectura.temperatura]);
+    presion.addRow([time, lectura.presion]);
   })
 }
 
