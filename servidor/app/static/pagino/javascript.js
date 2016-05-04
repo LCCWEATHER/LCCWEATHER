@@ -65,7 +65,12 @@ function actualizarFondo() {
 
   cosa = document.querySelector(".hora")
 
-  cosa.innerHTML = fecha.getHours() + ":" + fecha.getMinutes()
+  var hora = fecha.getHours()
+  hora = hora < 10? '0' + hora : hora
+  var minutos = fecha.getMinutes()
+  minutos = minutos < 10? '0' + minutos : minutos
+
+  cosa.innerHTML = hora + ":" + minutos 
 }
 
 google.charts.load('current', {packages: ['corechart', 'line']})
