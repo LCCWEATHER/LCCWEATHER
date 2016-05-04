@@ -83,20 +83,37 @@ function drawBasic() {
   presion.addColumn('timeofday', 'X')
   presion.addColumn('number', 'ayy')
 
-  cargarDatos(Date.now() - 5 * 60 * 60 * 1000).then(function(datos) {
-    console.log*(datos)
-    datos['datos'].forEach(function(lectura) {
-      var time = new Date(lectura.fecha)
-      var timeofday = [time.getHours(), time.getMinutes(), time.getSeconds()]
-      humedad.addRow([timeofday, lectura.humedad]);
-      temperatura.addRow([timeofday, lectura.temperatura]);
-      presion.addRow([timeofday, lectura.presion]);
+  
+  var ultimaActualizacion = Date.now() - 2 * 60 * 60 * 1000
+  var graficaActual = 0;
+  function actualizarGrafica() {
+    cargarDatos(ultimaActualizacion).then(function(datos) {
+      var nRows = datos['datos'].length
+      console.log(datos)
+      if(nRows) {
+        if(presion.getNumberOfRows()) {
+          presion.removeRows(0, nRows)
+          humedad.removeRows(0, nRows)
+          temperatura.removeRows(0, nRows)
+        }
+        agregarDatos(presion, humedad, temperatura, datos['datos'])
+        actualizarMedidores(datos['datos'][0])
+        chart.draw(datos[graficaActual], opciones[graficaActual])
+      }
+      
+      chart.draw(tablas[graficaActual], opciones[graficaActual])
+      graficaActual = (graficaActual + 1) % 3;
+
+      setTimeout(actualizarGrafica, 5000)
     })
-    
-    actualizarMedidores(datos['datos'][0]);
-  })
+    ultimaActualizacion = Date.now()
+  }
 
   var opcion1 = {
+    animation:{
+        duration: 1000,
+        easing: 'out'
+    },
     hAxis: {
       title: 'Hora',
       baselineColor: '#fff'
@@ -108,6 +125,10 @@ function drawBasic() {
     backgroundColor: { fill:'transparent' },
   }
   var opcion2 = {
+    animation:{
+        duration: 1000,
+        easing: 'out'
+    },
     hAxis: {
       title: 'Hora',
       baselineColor: '#fff'
@@ -119,6 +140,10 @@ function drawBasic() {
     backgroundColor: { fill:'transparent' },
   }
   var opcion3 = {
+    animation:{
+        duration: 1000,
+        easing: 'out'
+      },
     hAxis: {
       title: 'Hora',
       baselineColor: '#fff'
@@ -131,19 +156,20 @@ function drawBasic() {
   }
   
   var chart = new google.visualization.LineChart(document.getElementById('grafica_temp'))
-  var datos = [temperatura,presion,humedad]
-  var opciones = [opcion1,opcion2,opcion3]
-  var graficaActual = 0;
+  var tablas = [temperatura, presion, humedad]
+  var opciones = [opcion1, opcion2, opcion3]
   function siguienteGrafica() {
-    graficaActual = (graficaActual + 1) % 3;
     chart.draw(datos[graficaActual], opciones[graficaActual])
   }
-  chart.draw(datos[0],opciones[0])
-  setInterval(siguienteGrafica, 3 * 1000)
+  //chart.draw(datos[0],opciones[0])
+  //setInterval(siguienteGrafica, 3 * 1000)
+  
+  actualizarGrafica()
+
   
   return {
     chart,
-    datos
+    tablas
   }
 }
 var alturaMax = 123
@@ -172,6 +198,16 @@ function cargarDatos(tiempo) {
     .then(function(respuesta) {
       return respuesta.json()
     })
+}
+
+function agregarDatos(presion, humedad, temperatura, datos) {
+  datos.reverse().forEach(function(lectura) {
+    var time = new Date(lectura.fecha)
+    var timeofday = [time.getHours(), time.getMinutes(), time.getSeconds()]
+    humedad.addRow([timeofday, lectura.humedad]);
+    temperatura.addRow([timeofday, lectura.temperatura]);
+    presion.addRow([timeofday, lectura.presion]);
+  })
 }
 
 function actualizarMedidores(lectura) {
