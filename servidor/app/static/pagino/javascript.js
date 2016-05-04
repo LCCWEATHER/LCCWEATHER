@@ -34,14 +34,14 @@ var dias = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sab
 
 function toCSSGradient(data)
 {
-  var css = "linear-gradient(to bottom, ";
-  var len = data.length;
+  var css = "linear-gradient(to bottom, "
+  var len = data.length
 
   for (var i=0;i<len;i++)
   {
-     var item = data[i];
-     css+= " #" + item.color + " " + item.position + "%";
-     if ( i<len-1 ) css += ",";
+     var item = data[i]
+     css+= " #" + item.color + " " + item.position + "%"
+     if ( i<len-1 ) css += ","
   }
   return css + ")";
 }
@@ -78,52 +78,24 @@ function drawBasic() {
   var presion = new google.visualization.DataTable()
   humedad.addColumn('timeofday','h')
   humedad.addColumn('number','b')
-
-  humedad.addRows([
-    [[8, 30, 45], 5],
-    [[9, 0, 0], 10],
-    [[10, 0, 0, 0], 12],
-    [[10, 45, 0, 0], 13],
-    [[11, 0, 0, 0], 15],
-    [[12, 15, 45, 0], 20],
-    [[13, 0, 0, 0], 22],
-    [[14, 30, 0, 0], 25],
-    [[15, 12, 0, 0], 30],
-    [[16, 45, 0], 32],
-    [[16, 59, 0], 42]
-  ])
   temperatura.addColumn('timeofday','h')
   temperatura.addColumn('number','C°')
-  temperatura.addRows([
-    [[8, 30, 45], 5],
-    [[9, 0, 0], 10],
-    [[10, 0, 0, 0], 12],
-    [[10, 45, 0, 0], 13],
-    [[11, 0, 0, 0], 15],
-    [[12, 15, 45, 0], 20],
-    [[13, 0, 0, 0], 22],
-    [[14, 30, 0, 0], 25],
-    [[15, 12, 0, 0], 30],
-    [[16, 45, 0], 32],
-    [[16, 59, 0], 42]
-  ])
-
   presion.addColumn('timeofday', 'X')
   presion.addColumn('number', 'ayy')
 
-  presion.addRows([
-    [[8, 30, 45], 5],
-    [[9, 0, 0], 10],
-    [[10, 0, 0, 0], 12],
-    [[10, 45, 0, 0], 13],
-    [[11, 0, 0, 0], 15],
-    [[12, 15, 45, 0], 20],
-    [[13, 0, 0, 0], 22],
-    [[14, 30, 0, 0], 25],
-    [[15, 12, 0, 0], 30],
-    [[16, 45, 0], 32],
-    [[16, 59, 0], 42]
-  ])
+  cargarDatos(Date.now() - 5 * 60 * 60 * 1000).then(function(datos) {
+    console.log*(datos)
+    datos['datos'].forEach(function(lectura) {
+      var time = new Date(lectura.fecha)
+      var timeofday = [time.getHours(), time.getMinutes(), time.getSeconds()]
+      humedad.addRow([timeofday, lectura.humedad]);
+      temperatura.addRow([timeofday, lectura.temperatura]);
+      presion.addRow([timeofday, lectura.presion]);
+    })
+    
+    actualizarMedidores(datos['datos'][0]);
+  })
+
   var opcion1 = {
     hAxis: {
       title: 'Hora',
@@ -157,6 +129,7 @@ function drawBasic() {
     },
     backgroundColor: { fill:'transparent' },
   }
+  
   var chart = new google.visualization.LineChart(document.getElementById('grafica_temp'))
   var datos = [temperatura,presion,humedad]
   var opciones = [opcion1,opcion2,opcion3]
@@ -193,21 +166,23 @@ function actualizar_termometro(cTemp) {
   }
 }
 
-function cargarDatosInciales() {
-  var dominio = ''
-  fetch('http://localhost:5000/api/lecturas?n=5')
+function cargarDatos(tiempo) {
+  var dominio = 'http://localhost:5000'
+  return fetch(dominio + '/api/lecturas?d=' + tiempo)
     .then(function(respuesta) {
       return respuesta.json()
-    }).then(function(json) {
-      var ultima = json.datos[0]
-      var centigrados = ultima.temperatura - 273
-      $('#valorTemperatura').text(centigrados + '°')
-      $('#valorPresion').text(ultima.presion + ' hpa')
-      $('#valorHumedad').text(ultima.humedad + '%')
-      $('#valorMonoxido').text(ultima.monoxido + '%')
-      $('#valorNitrogeno').text(ultima.nitrogeno + '%')
-      actualizar_termometro(centigrados)
     })
+}
+
+function actualizarMedidores(lectura) {
+  var centigrados = lectura.temperatura - 273
+
+  $('#valorTemperatura').text(centigrados + '°')
+  $('#valorPresion').text(lectura.presion + ' hpa')
+  $('#valorHumedad').text(lectura.humedad + '%')
+  $('#valorMonoxido').text(lectura.monoxido + '%')
+  $('#valorNitrogeno').text(lectura.nitrogeno + '%')
+  actualizar_termometro(centigrados)
 }
 
 function cargarAlertas() {
@@ -224,6 +199,5 @@ function cargarAlertas() {
     })
 }
 
-var datos = cargarDatosInciales()
 actualizarFondo()
 setInterval(actualizarFondo, 60 * 1000);
