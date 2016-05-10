@@ -184,8 +184,8 @@ def get_lecturas():
 
 @mod.route('/api/data.csv', methods=['GET'])
 def csv_export():
-    inferior = request.args.get('i')
-    superior = request.args.get('s')
+    inferior = datetime.datetime.utcfromtimestamp(float(request.args.get('i')) / 1000.0)
+    superior = datetime.datetime.utcfromtimestamp(float(request.args.get('s')) / 1000.0)
 
     if not inferior or not superior:
         abort(400)
