@@ -1,11 +1,13 @@
 from flask import (Blueprint, render_template, abort, request, redirect,
-                   current_app, redirect, url_for, flash, jsonify)
+                   current_app, redirect, url_for, flash, jsonify, send_file)
 from .forms import LoginForm, AddAlertForm
 from .models import User, Alert, Lectura, LecturaSchema, AlertSchema
 from flask.ext.login import (login_required, login_user, logout_user,
                              current_user)
 from app import db, login_manager, bcrypt
 import datetime
+import csv
+import tempfile
 
 mod = Blueprint('servidor_clima', __name__)
 
@@ -147,7 +149,7 @@ alerts_schema = AlertSchema(many=True)
 def get_lecturas():
     if request.method == 'GET':
         n = request.args.get('n')
-        
+
         d = request.args.get('d')
 
         if not n and not d:
@@ -180,7 +182,35 @@ def get_lecturas():
             abort(500)
 
 
-@mod.route('/api/alertas')
+@mod.route('/api/data.csv', methods=['GET'])
+def csv_export():
+    inferior = request.args.get('i')
+    superior = request.args.get('s')
+
+    if not inferior or not superior:
+        abort(400)
+
+    data = Lectura.query \
+        .filter(Lectura.fecha >= inferior) \
+        .filter(Lectura.fecha <= superior) \
+        .order_by(Lectura.fecha.desc())
+
+    data = lecturas_schema.dump(data)
+
+    with tempfile.TemporaryFile() as csv_file:
+        keys = ['fecha', 'humedad', 'luz', 'calidadaire', 'nitrogeno',
+                'monoxido', 'temperatura', 'presion']
+
+        writer = csv.DictWriter(csv_file, keys)
+        writer.writeheader()
+        writer.writerows(data)
+
+        send_file(csv_file)
+
+
+
+
+@mod.route('/api/alertas', methods=['GET'])
 def get_alertas():
     alerts = Alert.query.filter(Alert.active)
     result = alerts_schema.dump(alerts)
