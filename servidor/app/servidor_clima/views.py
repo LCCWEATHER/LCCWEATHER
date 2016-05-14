@@ -1,5 +1,5 @@
 from flask import (Blueprint, render_template, abort, request, redirect,
-                   current_app, redirect, url_for, flash, jsonify, send_file)
+                   current_app, redirect, url_for, flash, jsonify, send_file, after_this_request)
 from .forms import LoginForm, AddAlertForm
 from .models import User, Alert, Lectura, LecturaSchema, AlertSchema
 from flask.ext.login import (login_required, login_user, logout_user,
@@ -8,6 +8,7 @@ from app import db, login_manager, bcrypt
 import datetime
 import csv
 import tempfile
+import os
 
 mod = Blueprint('servidor_clima', __name__)
 
@@ -184,11 +185,14 @@ def get_lecturas():
 
 @mod.route('/api/data.csv', methods=['GET'])
 def csv_export():
-    inferior = datetime.datetime.utcfromtimestamp(float(request.args.get('i')) / 1000.0)
-    superior = datetime.datetime.utcfromtimestamp(float(request.args.get('s')) / 1000.0)
+    inferior = request.args.get('i')
+    superior = request.args.get('s')
 
     if not inferior or not superior:
         abort(400)
+
+    inferior = datetime.datetime.utcfromtimestamp(float(inferior) / 1000.0)
+    superior = datetime.datetime.utcfromtimestamp(float(superior) / 1000.0)
 
     data = Lectura.query \
         .filter(Lectura.fecha >= inferior) \
@@ -197,15 +201,25 @@ def csv_export():
 
     data = lecturas_schema.dump(data)
 
-    with tempfile.TemporaryFile() as csv_file:
-        keys = ['fecha', 'humedad', 'luz', 'calidadaire', 'nitrogeno',
-                'monoxido', 'temperatura', 'presion']
+    # handle, filepath = tempfile.mkstemp()
 
-        writer = csv.DictWriter(csv_file, keys)
-        writer.writeheader()
-        writer.writerows(data)
+    csv_file = tempfile.TemporaryFile(mode='w+b')
+    keys = ['id', 'fecha', 'humedad', 'luz', 'calidadaire', 'nitrogeno',
+            'monoxido', 'temperatura', 'presion']
 
-        send_file(csv_file)
+
+    #writer = csv.writer(csv_file)
+    xd = str.encode(keys[0])
+    csv_file.write(str.encode(','.join([key for key in keys])))
+    csv_file.write(b'\n')
+
+    for row in data.data:
+        csv_file.write(str.encode(','.join([str(row[key]) for key in keys])  + '\n'))
+
+    
+    csv_file.seek(0)
+
+    return send_file(csv_file, as_attachment=True, attachment_filename='data.csv')
 
 
 
