@@ -1,0 +1,9 @@
+[Print]
+filename=print
+enabled=on
+
+[Xively]
+filename=xively
+enabled=on
+APIKey=YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+FeedID=XXXXXXXXXX

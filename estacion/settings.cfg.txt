@@ -1,0 +1,4 @@
+[Main]
+uploadDelay = 5
+redPin=10
+greenPin=22
