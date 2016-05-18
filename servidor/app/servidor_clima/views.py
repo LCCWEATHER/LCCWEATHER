@@ -28,6 +28,10 @@ def request_loader(request):
     return None
 
 
+@mod.route('/')
+def index():
+    return redirect(url_for('static', filename='visualizacion/index.html'))
+
 @mod.route('/login', methods=["GET", "POST"])
 def login():
     form = LoginForm()
