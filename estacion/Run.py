@@ -112,7 +112,7 @@ for i in outputNames:
 		#if enabled, load the plugin
 		if enabled:
 			try:
-				mod = __import__('outputs.'+filename,fromlist=['a']) #Why does this work?
+				mod = __import__('outputs.'+filename,fromlist=['a']) #entra a la carpeta y abre el archivo de output
 			except Exception:
 				print("Error: could not import output module " + filename)
 				raise
@@ -166,7 +166,7 @@ mainConfig = ConfigParser.SafeConfigParser()
 mainConfig.read("settings.cfg")
 
 lastUpdated = 0
-delayTime = mainConfig.getfloat("Main","uploadDelay")
+delayTime = mainConfig.getfloat("Main","uploadDelay")#tiempo
 redPin = mainConfig.getint("Main","redPin")
 greenPin = mainConfig.getint("Main","greenPin")
 GPIO.setup(redPin,GPIO.OUT,initial=GPIO.LOW)
