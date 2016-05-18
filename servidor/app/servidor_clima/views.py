@@ -150,17 +150,25 @@ alerts_schema = AlertSchema(many=True)
 def get_lecturas():
     if request.method == 'GET':
         n = request.args.get('n')
-
         d = request.args.get('d')
+        h = request.args.get('h')
+        
+        if h:
+            h = float(h)
+            now = datetime.datetime.utcnow() - datetime.timedelta(seconds=h / 1000.0)
+            lecturas = Lectura.query \
+                .filter(Lectura.fecha >= now) \
+                .order_by(Lectura.fecha.desc())
 
-        if not n and not d:
-            n = 1
-        if d:
-            d = datetime.datetime.utcfromtimestamp(float(d)/1000.0)
-            print(d.minute)
-            lecturas = Lectura.query.filter(Lectura.fecha >= d).order_by(Lectura.fecha.desc())
         else:
-            lecturas = Lectura.query.order_by(Lectura.fecha.desc())
+            if not n and not d:
+                n = 1
+            if d:
+                d = datetime.datetime.utcfromtimestamp(float(d)/1000.0)
+                print(d.minute)
+                lecturas = Lectura.query.filter(Lectura.fecha >= d).order_by(Lectura.fecha.desc())
+            else:
+                lecturas = Lectura.query.order_by(Lectura.fecha.desc())
         if n:
             lecturas = lecturas[:n]
         result = lecturas_schema.dump(lecturas)

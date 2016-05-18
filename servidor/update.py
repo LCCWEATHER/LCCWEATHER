@@ -9,10 +9,13 @@ params = {'q': 'Hermosillo', 'APPID': apikey}
 
 
 def update():
+
+    r = requests.get('http://api.openweathermap.org/data/2.5/weather', params)
+    json = r.json()
     l = Lectura(
-        random.randint(1, 100),
-        random.randint(1, 100),
-        random.randint(1, 100)
+        json['main']['temp'] + random.randint(-3, 3),
+        json['main']['pressure'] + random.randint(-3, 3),
+        json['main']['humidity'] + random.randint(-3, 3)
     )
 
     db.session.add(l)

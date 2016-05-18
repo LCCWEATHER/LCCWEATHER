@@ -89,10 +89,10 @@ function drawBasic() {
   presion.addColumn('number', 'ayy')
 
   
-  var ultimaActualizacion = Date.now() - 1 * 60 * 60 * 1000
+  var ultimaActualizacion = Date.now() - 2 * 60 * 60 * 1000
   var graficaActual = 0;
   function actualizarGrafica() {
-    cargarDatos(ultimaActualizacion).then(function(datos) {
+    cargarDatos(Date.now() - ultimaActualizacion).then(function(datos) {
       var nRows = datos['datos'].length
       console.log(datos)
       if(nRows) {
@@ -109,9 +109,9 @@ function drawBasic() {
       chart.draw(tablas[graficaActual], opciones[graficaActual])
       graficaActual = (graficaActual + 1) % 3;
 
+      ultimaActualizacion = Date.now()
       setTimeout(actualizarGrafica, 5000)
     })
-    ultimaActualizacion = Date.now()
   }
 
   var opcion1 = {
@@ -199,7 +199,7 @@ function actualizar_termometro(cTemp) {
 
 function cargarDatos(tiempo) {
   var dominio = 'http://localhost:5000'
-  return fetch(dominio + '/api/lecturas?d=' + tiempo)
+  return fetch(dominio + '/api/lecturas?h=' + tiempo)
     .then(function(respuesta) {
       return respuesta.json()
     })
@@ -210,7 +210,7 @@ function agregarDatos(presion, humedad, temperatura, datos) {
     var time = new Date(lectura.fecha)
     var timeofday = [time.getHours(), time.getMinutes(), time.getSeconds()]
     humedad.addRow([time, lectura.humedad]);
-    temperatura.addRow([time, lectura.temperatura]);
+    temperatura.addRow([time, lectura.temperatura - 273]);
     presion.addRow([time, lectura.presion]);
   })
 }
@@ -242,3 +242,4 @@ function cargarAlertas() {
 
 actualizarFondo()
 setInterval(actualizarFondo, 60 * 1000);
+setInterval(cargarAlertas, 60 * 1000);
