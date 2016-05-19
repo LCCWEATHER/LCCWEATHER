@@ -215,23 +215,31 @@ def csv_export():
 
     # handle, filepath = tempfile.mkstemp()
 
-    csv_file = tempfile.TemporaryFile(mode='w+b')
+    handle, filepath = tempfile.mkstemp()
+    csv_file = os.fdopen(handle, mode='w+')
+
     keys = ['id', 'fecha', 'humedad', 'luz', 'calidadaire', 'nitrogeno',
             'monoxido', 'temperatura', 'presion']
 
 
+    @after_this_request
+    def cleanup(response):
+        os.remove(filepath)
+        return response
+
     #writer = csv.writer(csv_file)
     xd = str.encode(keys[0])
-    csv_file.write(str.encode(','.join([key for key in keys])))
-    csv_file.write(b'\n')
+    csv_file.write(','.join([key for key in keys]))
+    csv_file.write('\n')
 
     for row in data.data:
-        csv_file.write(str.encode(','.join([str(row[key]) for key in keys])  + '\n'))
+        csv_file.write(','.join([str(row[key]) for key in keys])  + '\n')
 
     
-    csv_file.seek(0)
+    csv_file.close()
+    
 
-    return send_file(csv_file, as_attachment=True, attachment_filename='data.csv')
+    return send_file(filepath, as_attachment=True, attachment_filename='data.csv')
 
 
 
