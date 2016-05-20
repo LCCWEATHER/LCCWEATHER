@@ -11,7 +11,7 @@ class Serve(output.Output()):
 				hum=i["value"]
 			if i["name"]=="temperature":
 				temp=i["value"]
-		    data={temperatura=temp,humedad=hum}
+		data={temperatura=temp,humedad=hum}
     	dataJson = json.dumps(data)
 		r=requests.post("148.225.71.4/api/lecturas",dataJson,auth=HTTPBasicAuth("admin","pingyburrito123")
 		r.text
