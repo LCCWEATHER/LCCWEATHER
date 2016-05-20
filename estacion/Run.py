@@ -178,10 +178,15 @@ while True:
 		data = []
 		#Collect the data from each sensor
 		for i in sensorPlugins:
+			dataDict = {}
 			val = i.getVal()
 			if val==None: #this means it has no data to upload.
 				continue
-			dataDict= i.getVal()
+			dataDict["value"] = i.getVal()
+			dataDict["unit"] = i.valUnit
+			dataDict["symbol"] = i.valSymbol
+			dataDict["name"] = i.valName
+			dataDict["sensor"] = i.sensorName
 			data.append(dataDict)
 		working = True
 		for i in outputPlugins:
