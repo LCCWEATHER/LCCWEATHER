@@ -6,6 +6,8 @@ class Serve(output.Output()):
 	def __init__(self,data):
 		pass
 	def outputData(self,dataPoints):
+		hum=0
+		temp=0
 		for i in dataPoints:
 			if i["name"]=="humidity":
 				hum=i["value"]
